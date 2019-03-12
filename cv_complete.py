@@ -153,28 +153,32 @@ def calc_strafe(vision_data):
     t2 = vision_data[1]
     width = t2['center'] - t1['center']
     center = t1['center'] + .5*width
-    offset = 12 * (width/t_width)
+    offset = 0 #12 * (width/t_width)
     ratio = (center + offset)/pixels_x
     angle = (x_angle*ratio) - (.5*x_angle)
     return angle*-1
 
 
-def calc_rotation(heights_array, d_mid):
+def calc_rotation(heights_array, d_mid, theta):
     d1 = calc_distance([heights_array[0]])
     d2 = calc_distance([heights_array[1]])
-    cos_a = (t_width**2 + d2**2 - d1**2)/(2*t_width*d2)
-    if cos_a < 1:
-        angle = math.acos(cos_a)
-        h = d1*math.sin(angle)
-        z = math.acos(h/d_mid)
+    if d1 == d2:
+        return theta
+    elif d1>d2:
+        cos_a = (d1**2 + t_width**2 - d2**2)/(2*d1*t_width)
     else:
-        z = 0
-    if d1 > d2:
-        z = z*-1
+        cos_a = (d2**2 + t_width**2 - d1**2)/(2*d2*t_width)
+
+    d_diff = d2 - d1
+    a_sqrd = d_diff**2 + t_width**2 - 2*abs(d_diff)*t_width*cos_a
+    length_a = math.sqrt(abs(a_sqrd))
+    angle_b = (180/math.pi)*math.asin(abs(d_diff)*math.sin(a)/length_a)  # law of sines
+    # angle_b is the strafe minus rotational angles
+    z = theta - angle_b
     return z
 
 
-y_angle = 35 * math.pi/180  # 43.3
+y_angle = 35 * math.pi/180
 x_angle = 70.4
 t_width = 13.42
 t_height = 5.82
@@ -206,15 +210,15 @@ while True:
             z_rotation = 0
         else:
             distance = calc_distance(heights)
-            z_rotation = calc_rotation(heights, distance)
+            z_rotation = calc_rotation(heights, distance, strafe)
 
     else:
         distance = 0
         strafe = 0
         z_rotation = 0
         
-    print('Distance: ', distance)
-    print('Strafe: ', strafe)
+    #print('Distance: ', distance)
+    #print('Strafe: ', strafe)
     print('Z angle: ', z_rotation)
     table.putNumberArray('VisionData', [distance, strafe, z_rotation])
 
