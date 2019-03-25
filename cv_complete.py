@@ -159,25 +159,6 @@ def calc_strafe(vision_data):
     return angle*-1
 
 
-#def calc_rotation(heights_array, d_mid, theta):
-#    d1 = calc_distance([heights_array[0]])
-#    d2 = calc_distance([heights_array[1]])
-#    if d1 == d2:
-#        return theta
-#    elif d1>d2:
-#        cos_a = (d1**2 + t_width**2 - d2**2)/(2*d1*t_width)
-#    else:
-#        cos_a = (d2**2 + t_width**2 - d1**2)/(2*d2*t_width)
-
-#    d_diff = d2 - d1
-#    a_sqrd = d_diff**2 + t_width**2 - 2*abs(d_diff)*t_width*cos_a
-#    length_a = math.sqrt(abs(a_sqrd))
-#    angle_b = (180/math.pi)*math.asin(abs(d_diff)*math.sin(a)/length_a)  # law of sines
-    # angle_b is the strafe minus rotational angles
-#    z = theta - angle_b
-#    return z
-
-
 y_angle = 35 * math.pi/180
 x_angle = 70.4
 t_width = 13.42
@@ -201,24 +182,19 @@ while True:
         
         strafe = calc_strafe(vision_array)
 
-        # check to see if target is too close: if so, return d=0 and use IR value in LV code
         check_1 = vision_array[0]['center'] - vision_array[0]['width'] <= 0
         check_2 = vision_array[1]['center'] + vision_array[1]['width'] >= pixels_x
 
         if check_1 or check_2:
             distance = 0
-            #z_rotation = 0
         else:
             distance = calc_distance(heights)
-            #z_rotation = calc_rotation(heights, distance, strafe)
 
     else:
         distance = 0
         strafe = 0
-        #z_rotation = 0
-        
-    #print('Distance: ', distance)
-    #print('Strafe: ', strafe)
+
+    print(distance, strafe)
     table.putNumberArray('VisionData', [distance, strafe])
 
 
